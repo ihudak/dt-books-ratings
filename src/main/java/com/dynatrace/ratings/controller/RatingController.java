@@ -46,7 +46,9 @@ public class RatingController extends HardworkingController {
     public Rating getRatingById(@PathVariable Long id) {
         Optional<Rating> rating = ratingRepository.findById(id);
         if (rating.isEmpty()) {
-            throw new ResourceNotFoundException("Rating not found");
+            ResourceNotFoundException ex = new ResourceNotFoundException("Rating not found");
+            logger.error(ex.getMessage());
+            throw ex;
         }
         return rating.get();
     }
@@ -65,9 +67,13 @@ public class RatingController extends HardworkingController {
     public Rating updateRatingById(@PathVariable Long id, @RequestBody Rating rating) {
         Optional<Rating> ratingDb = ratingRepository.findById(id);
         if (ratingDb.isEmpty()) {
-            throw new ResourceNotFoundException("Rating not found");
+            ResourceNotFoundException ex = new ResourceNotFoundException("Rating not found");
+            logger.error(ex.getMessage());
+            throw ex;
         } else if (rating.getId() != id || ratingDb.get().getId() != id) {
-            throw new BadRequestException("bad rating id");
+            BadRequestException ex = new BadRequestException("bad rating id");
+            logger.error(ex.getMessage());
+            throw ex;
         }
         return ratingRepository.save(rating);
     }
