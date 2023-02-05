@@ -20,8 +20,8 @@ public class RatingController extends HardworkingController {
     @Autowired
     private RatingRepository ratingRepository;
     @Autowired
-    ConfigRepository configRepository;
-    Logger logger = LoggerFactory.getLogger(RatingController.class);
+    private ConfigRepository configRepository;
+    private Logger logger = LoggerFactory.getLogger(RatingController.class);
 
     // get all ratings
     @GetMapping("")
