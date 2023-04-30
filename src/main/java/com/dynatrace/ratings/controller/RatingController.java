@@ -97,7 +97,7 @@ public class RatingController extends HardworkingController {
     // delete all ratings
     @DeleteMapping("/delete-all")
     public void deleteAllRatings() {
-        ratingRepository.deleteAll();
+        ratingRepository.truncateTable();
     }
 
     @Override
