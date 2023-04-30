@@ -2,7 +2,11 @@ package com.dynatrace.ratings.controller;
 
 import com.dynatrace.ratings.exception.BadRequestException;
 import com.dynatrace.ratings.exception.ResourceNotFoundException;
+import com.dynatrace.ratings.model.Book;
+import com.dynatrace.ratings.model.Client;
 import com.dynatrace.ratings.model.Rating;
+import com.dynatrace.ratings.repository.BookRepository;
+import com.dynatrace.ratings.repository.ClientRepository;
 import com.dynatrace.ratings.repository.ConfigRepository;
 import com.dynatrace.ratings.repository.RatingRepository;
 import org.slf4j.Logger;
@@ -19,6 +23,10 @@ import java.util.Optional;
 public class RatingController extends HardworkingController {
     @Autowired
     private RatingRepository ratingRepository;
+    @Autowired
+    private ClientRepository clientRepository;
+    @Autowired
+    private BookRepository bookRepository;
     @Autowired
     private ConfigRepository configRepository;
     private Logger logger = LoggerFactory.getLogger(RatingController.class);
@@ -58,6 +66,8 @@ public class RatingController extends HardworkingController {
     public Rating createRating(@RequestBody Rating rating) {
         simulateHardWork();
         simulateCrash();
+        this.verifyBook(rating.getIsbn());
+        this.verifyClient(rating.getEmail());
         logger.debug("Creating Rating for book " + rating.getIsbn() + " from user " + rating.getEmail());
         return ratingRepository.save(rating);
     }
@@ -93,5 +103,31 @@ public class RatingController extends HardworkingController {
     @Override
     public ConfigRepository getConfigRepository() {
         return configRepository;
+    }
+
+
+    private void verifyClient(String email) {
+        logger.info("Verifying client " + email);
+        Client client = clientRepository.getClientByEmail(email);
+        if (null == client) {
+            ResourceNotFoundException ex = new ResourceNotFoundException("Client is not found by email " + email);
+            logger.error(ex.getMessage());
+            throw ex;
+        }
+        Client[] clients = clientRepository.getAllClients();
+        logger.debug(clients.toString());
+    }
+
+    private Book verifyBook(String isbn) {
+        logger.info("Verifying book " + isbn);
+        Book book = bookRepository.getBookByISBN(isbn);
+        if (null == book) {
+            ResourceNotFoundException ex = new ResourceNotFoundException("Book not found by isbn " + isbn);
+            logger.error(ex.getMessage());
+            throw ex;
+        }
+        Book[] books = bookRepository.getAllBooks();
+        logger.debug(books.toString());
+        return book;
     }
 }
